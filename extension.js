@@ -41,7 +41,7 @@ const WorldClockMultiButton = new Lang.Class({
     this._sunset = new St.Label();
 
     let m = this.menu;
-    m.addActor(this._place);
+    m.actor.add_child(this._place);
 
     let box = new St.BoxLayout({ style_class: 'location-day' });
     this._dayIcon = new St.Icon({
@@ -60,7 +60,7 @@ const WorldClockMultiButton = new Lang.Class({
     });
     box.add_actor(this._nightIcon);
     box.add_actor(this._sunset);
-    m.addActor(box);
+    m.actor.add_child(box);
 
     // m.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
@@ -134,7 +134,7 @@ const WorldClockMultiButton = new Lang.Class({
       }
       let item = new PopupMenu.PopupMenuItem(display);
       item.location = lbt;
-      item.setShowDot(lbt.code == that._lbt.code);
+      item.setOrnament(lbt.code == that._lbt.code ? PopupMenu.Ornament.DOT:PopupMenu.Ornament.NONE);
       lm.addMenuItem(item);
       item.connect('activate', function (actor) {
 	that.switchLbt(actor.location);
@@ -265,7 +265,6 @@ function enable() {
   ci.box.add(ci.content);
 
   let separator = new PopupMenu.PopupSeparatorMenuItem();
-  separator.setColumnWidths(1);
   ci.content.separator = separator.actor;
   ci.box.add(separator.actor, { y_align: St.Align.END, expand: false, y_fill: false });
   
@@ -419,14 +418,15 @@ function addClockCal() {
   refreshClockCal();
 }
 
-
 function disable() {
   ExtensionSystem.disconnect(extensionSig);
   extensionSig = null;
   locations = [];
-  buttons.map(function (x) {
-    x.destroy();
-  });
+  // todo:  Clutter:ERROR:./clutter-actor.c:5759:clutter_actor_dispose: assertion failed: (priv->parent == NULL)
+  // todo:  is caused by the code below
+//  buttons.map(function (x) {
+//    x.destroy();
+//  });
   buttons = [];
   clock.run_dispose();
   clock = null;
